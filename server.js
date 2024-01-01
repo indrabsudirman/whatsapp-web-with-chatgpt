@@ -84,25 +84,6 @@ app.use("*", (req, res) => {
 
 app.use(errorHandlerMiddleware);
 
-// Init WhatsAppWeb JS
-// const client = new Client({
-//   authStrategy: new LocalAuth({
-//     clientId: "PHONE_NUMBER_FROM_JWT",
-//   }),
-// });
-
-// client.on("qr", (qr) => {
-//   console.log(`Qr Code received ${qr}`);
-// });
-
-// client.on("authenticated", () => {
-//   console.log(`Client with id ${client.clientId} already authenticated`);
-// });
-
-// client.on("ready", () => {
-//   console.log(`Client with id ${client.clientId} already ready`);
-// });
-
 const allSessionsObject = {};
 
 const createWhatsAppSession = (id, socket) => {
@@ -118,23 +99,31 @@ const createWhatsAppSession = (id, socket) => {
 
   client.on("qr", (qr) => {
     console.log(`QR Received ${qr}`);
+    socket.emit("qr", {
+      qr,
+    });
   });
 
   client.on("authenticated", () => {
-    console.log(`Client with id ${client.clientId} already authenticated`);
+    console.log(`Client with id ${id} already authenticated`);
+    socket.emit("authenticated", {
+      id,
+      message: `Client with ${id} is authenticated!`,
+    });
   });
 
   client.on("ready", () => {
-    console.log(`Client with id ${client.clientId} already ready`);
+    console.log(`Client with id ${id} already ready`);
+    socket.emit("ready", {
+      id,
+      message: `Client with ${id} is ready!`,
+    });
   });
 
   client.initialize();
 };
 
 const PORT = process.env.PORT || 5100;
-
-//Initialize the whatsapp connection
-// initWhatsApp(io);
 
 httpServer.listen(PORT, () => {
   console.log(`App running on port ${PORT} ...`);
