@@ -4,7 +4,7 @@ import { StatusCodes } from "http-status-codes";
 import pkg from "whatsapp-web.js";
 const { Client, LocalAuth } = pkg;
 import { createWhatsAppSession } from "../models/whatsappModel.js";
-import { getCurrentPhoneNumber } from "../controllers/userController.js";
+// import { getUserData } from "../controllers/userController.js";
 import errorHandlerMiddleware from "../middleware/errorHandlerMiddleware.js";
 
 export const getQRCode = (req, res) => {
@@ -23,7 +23,7 @@ export const initWhatsApp = async () => {
     }),
   });
 
-  const number = getCurrentPhoneNumber;
+  // const number = getUserData;
 
   console.log("Phone ", number);
 };

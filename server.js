@@ -11,6 +11,7 @@ import { Server } from "socket.io";
 import { initWhatsApp } from "./controllers/whatsappController.js";
 import pkg from "whatsapp-web.js";
 const { Client, LocalAuth } = pkg;
+import { getUserData } from "./controllers/userController.js";
 
 //database
 import { connectToDatabase } from "./connections/database.js";
@@ -52,9 +53,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("createSession", (data) => {
-    console.log(`Got message ${data.id}`);
-    const { id } = data;
-    createWhatsAppSession(id, socket);
+    console.log(`Got message ${data.message}`);
+    createWhatsAppSession(socket);
   });
 
   socket.on("disconnect", () => {
@@ -86,14 +86,16 @@ app.use(errorHandlerMiddleware);
 
 const allSessionsObject = {};
 
-const createWhatsAppSession = (id, socket) => {
-  console.log("Client will start ...");
+const createWhatsAppSession = (socket) => {
+  const { phoneNumber } = getUserData();
+  console.log(`phone number ${phoneNumber}`);
+  console.log(`Client will start ... with id ${phoneNumber}`);
   const client = new Client({
     puppeteer: {
       headless: true,
     },
     authStrategy: new LocalAuth({
-      clientId: id,
+      clientId: phoneNumber,
     }),
   });
 
@@ -105,18 +107,18 @@ const createWhatsAppSession = (id, socket) => {
   });
 
   client.on("authenticated", () => {
-    console.log(`Client with id ${id} already authenticated`);
+    console.log(`Client with id ${phoneNumber} already authenticated`);
     socket.emit("authenticated", {
-      id,
-      message: `Client with ${id} is authenticated!`,
+      phoneNumber,
+      message: `Client with ${phoneNumber} is authenticated!`,
     });
   });
 
   client.on("ready", () => {
-    console.log(`Client with id ${id} already ready`);
+    console.log(`Client with id ${phoneNumber} already ready`);
     socket.emit("ready", {
-      id,
-      message: `Client with ${id} is ready!`,
+      phoneNumber,
+      message: `Client with ${phoneNumber} is ready!`,
     });
   });
 

@@ -5,7 +5,6 @@ import { io } from "socket.io-client";
 
 const Messages = () => {
   const [currentSocket, setCurrentSocket] = useState(null);
-  const [session, setSession] = useState("089636002345");
   const [qrCode, setQrCode] = useState("");
 
   useEffect(() => {
@@ -48,9 +47,9 @@ const Messages = () => {
 
   const createSessionForWhatsApp = () => {
     currentSocket.emit("createSession", {
-      id: session, //rencana id session pakai phonenumber di cookie
+      message: "session starts from FE", //rencana id session pakai phonenumber di cookie
     });
-    console.log(`Start create session with id ${session}`);
+    console.log(`Start create session FE ...`);
   };
 
   return (
