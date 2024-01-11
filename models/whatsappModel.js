@@ -2,10 +2,7 @@ import { MongoStore } from "wwebjs-mongo";
 import pkg from "whatsapp-web.js";
 const { Client, LocalAuth } = pkg;
 //database
-import {
-  connectToDatabase,
-  getMultiDeviceCollection,
-} from "../connections/database.js";
+import { connectToDatabase } from "../connections/database.js";
 import mongoose from "mongoose";
 import EventEmitter from "node:events";
 

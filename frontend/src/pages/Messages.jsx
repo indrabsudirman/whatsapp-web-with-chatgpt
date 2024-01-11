@@ -6,6 +6,7 @@ import { io } from "socket.io-client";
 const Messages = () => {
   const [currentSocket, setCurrentSocket] = useState(null);
   const [qrCode, setQrCode] = useState("");
+  const [statusReady, setStatusReady] = useState(false);
 
   useEffect(() => {
     const socket = io("http://localhost:5100");
@@ -30,14 +31,17 @@ const Messages = () => {
       setQrCode(qr);
     });
     socket.on("authenticated", (data) => {
-      const { id, message } = data;
+      const { phoneNumber, message } = data;
       console.log(
-        `Client is Authenticated with id ${id} and the message ${message}`
+        `Client is Authenticated with id ${phoneNumber} and the message ${message}`
       );
     });
     socket.on("ready", (data) => {
-      const { id, message } = data;
-      console.log(`Client is Ready with id ${id} and the message ${message}`);
+      const { phoneNumber, message } = data;
+      console.log(
+        `Client is Ready with id ${phoneNumber} and the message ${message}`
+      );
+      setStatusReady(true);
     });
 
     return () => {
@@ -52,18 +56,29 @@ const Messages = () => {
     console.log(`Start create session FE ...`);
   };
 
+  const getAllChats = () => {
+    currentSocket.emit("getAllChats", { message: "get all chat from FE" });
+    console.log(`get All Chats start`);
+  };
+
   return (
     <Wrapper>
-      <h4>Scan this QR using your WhatsApp. </h4>
-      <div>
-        {qrCode === "" ? (
-          <button type="button" onClick={createSessionForWhatsApp}>
-            Refresh
-          </button>
-        ) : (
-          <QRCode value={qrCode} />
-        )}
-      </div>
+      {statusReady ? (
+        <div>
+          <button onClick={getAllChats}>Get All Chats</button>
+        </div>
+      ) : (
+        <div>
+          <h4>Scan this QR using your WhatsApp. </h4>
+          {qrCode === "" ? (
+            <button type="button" onClick={createSessionForWhatsApp}>
+              Refresh
+            </button>
+          ) : (
+            <QRCode value={qrCode} />
+          )}
+        </div>
+      )}
     </Wrapper>
   );
 };

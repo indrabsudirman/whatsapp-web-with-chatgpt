@@ -1,17 +1,29 @@
 import mongoose from "mongoose";
+import { error } from "qrcode-terminal";
+
+// export const connectToDatabase = async () => {
+//   try {
+//     await mongoose.connect(process.env.MONGO_DB_LOCAL);
+//     console.log("Success connected to database!");
+//   } catch (error) {
+//     console.log(`Failed to connect database ${error}`);
+//   }
+// };
+
+// export const getMultiDeviceCollection = (options) => {
+//   const collectionName = `whatsapp-${options.session}.files`;
+//   return mongoose.connection.db.collection(collectionName);
+// };
 
 export const connectToDatabase = async () => {
   try {
     await mongoose.connect(process.env.MONGO_DB_LOCAL);
-    console.log("Success connected to database!");
+    console.log(`Successfully connected to database!`);
+    return mongoose;
   } catch (error) {
-    console.log(`Failed to connect database ${error}`);
+    console.log(`Error to connect to databases ${error}`);
+    throw error;
   }
-};
-
-export const getMultiDeviceCollection = (options) => {
-  const collectionName = `whatsapp-${options.session}.files`;
-  return mongoose.connection.db.collection(collectionName);
 };
 
 //   await mongoose.connect(process.env.MONGO_DB_LOCAL).then(

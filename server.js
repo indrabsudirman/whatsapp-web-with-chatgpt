@@ -31,6 +31,7 @@ import { authenticateUser } from "./middleware/authMiddleware.js";
 connectToDatabase();
 
 const app = express();
+const allSessionsObject = {};
 
 //Init socket
 const httpServer = http.createServer(app);
@@ -44,10 +45,10 @@ const io = new Server(httpServer, {
 io.on("connection", (socket) => {
   console.log("a user connected here", socket?.id);
 
-  //Send to client using emit
+  //Sample Send to client using emit
   socket.emit("hello", "Hi this is from backend 1");
 
-  //Received from client using on
+  //Sample Received from client using on
   socket.on("test", (arg) => {
     console.log(`Object connected from client, message is ${arg}`);
   });
@@ -55,6 +56,19 @@ io.on("connection", (socket) => {
   socket.on("createSession", (data) => {
     console.log(`Got message ${data.message}`);
     createWhatsAppSession(socket);
+  });
+
+  socket.on("getAllChats", async (data) => {
+    const { phoneNumber } = getUserData();
+    console.log(`Get All Chats ${data}`);
+    const { message } = data;
+    console.log(`Message from FE ${message}`);
+    const client = allSessionsObject[phoneNumber];
+    const chats = await client.getChats();
+    console.log(chats);
+    socket.emit("getChats", {
+      chats,
+    });
   });
 
   socket.on("disconnect", () => {
@@ -83,8 +97,6 @@ app.use("*", (req, res) => {
 });
 
 app.use(errorHandlerMiddleware);
-
-const allSessionsObject = {};
 
 const createWhatsAppSession = (socket) => {
   const { phoneNumber } = getUserData();
@@ -116,6 +128,7 @@ const createWhatsAppSession = (socket) => {
 
   client.on("ready", () => {
     console.log(`Client with id ${phoneNumber} already ready`);
+    allSessionsObject[phoneNumber] = client;
     socket.emit("ready", {
       phoneNumber,
       message: `Client with ${phoneNumber} is ready!`,
